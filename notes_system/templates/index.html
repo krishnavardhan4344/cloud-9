@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+{% from "_macros.html" import note_card with context %}
+{% block title %}Class notes, shared{% endblock %}
+{% block content %}
+<section class="hero">
+  <div class="hero-text">
+    <h1>Your department's notes, all in one place.</h1>
+    <p class="lead">Upload lecture notes, slides and question banks. Find them by subject or department. Download what you need before the exam.</p>
+    <div class="hero-actions">
+      {% if g.user %}
+        <a class="btn" href="{{ url_for('notes_list') }}">Browse notes</a>
+        <a class="btn btn-outline" href="{{ url_for('upload') }}">Upload a note</a>
+      {% else %}
+        <a class="btn" href="{{ url_for('register') }}">Create a free account</a>
+        <a class="btn btn-outline" href="{{ url_for('login') }}">Log in</a>
+      {% endif %}
+    </div>
+  </div>
+  <dl class="hero-stats">
+    <div><dt>Notes shared</dt><dd>{{ stats.notes }}</dd></div>
+    <div><dt>Subjects covered</dt><dd>{{ stats.subjects }}</dd></div>
+    <div><dt>Students</dt><dd>{{ stats.users }}</dd></div>
+  </dl>
+</section>
+
+{% if g.user %}
+<section>
+  <h2>Recently shared</h2>
+  {% if recent %}
+    <div class="grid">{% for n in recent %}{{ note_card(n, url_for('index')) }}{% endfor %}</div>
+  {% else %}
+    <p class="empty">No notes yet. <a href="{{ url_for('upload') }}">Upload the first one.</a></p>
+  {% endif %}
+</section>
+{% else %}
+<section class="steps">
+  <h2>How it works</h2>
+  <ol>
+    <li><strong>Create an account.</strong> Use your email and a password of at least 8 characters.</li>
+    <li><strong>Upload your notes.</strong> PDF, Word, PowerPoint, text and Markdown files up to {{ max_mb }} MB.</li>
+    <li><strong>Search and download.</strong> Filter by department, subject, semester or file type.</li>
+  </ol>
+</section>
+{% endif %}
+{% endblock %}

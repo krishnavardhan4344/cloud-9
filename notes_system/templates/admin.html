@@ -1,0 +1,75 @@
+{% extends "base.html" %}
+{% block title %}Admin dashboard{% endblock %}
+{% block content %}
+<div class="page-head"><h1>Admin dashboard</h1></div>
+
+<dl class="stat-row">
+  <div><dt>Users</dt><dd>{{ stats.users }}</dd></div>
+  <div><dt>Notes</dt><dd>{{ stats.notes }}</dd></div>
+  <div><dt>Storage used</dt><dd>{{ stats.bytes|filesize }}</dd></div>
+  <div><dt>Total downloads</dt><dd>{{ stats.downloads }}</dd></div>
+</dl>
+
+<section>
+  <h2>Uploaded materials</h2>
+  <form method="get" class="filters compact">
+    <input type="search" name="q" value="{{ q }}" placeholder="Search title, subject, uploader" aria-label="Search materials">
+    <button class="btn" type="submit">Search</button>
+  </form>
+  {% if notes %}
+  <div class="table-wrap">
+    <table class="responsive">
+      <thead><tr><th>Title</th><th>Department</th><th>Subject</th><th>Uploader</th><th>Size</th><th>Date</th><th>Action</th></tr></thead>
+      <tbody>
+      {% for n in notes %}
+        <tr>
+          <td data-label="Title">{{ n.title }} <span class="tag tag-type">{{ n.ext }}</span></td>
+          <td data-label="Department">{{ n.department }}</td>
+          <td data-label="Subject">{{ n.subject }}</td>
+          <td data-label="Uploader">{{ n.uploader_name }}</td>
+          <td data-label="Size">{{ n.size|filesize }}</td>
+          <td data-label="Date">{{ n.uploaded_at|datefmt }}</td>
+          <td data-label="Action" class="row-actions">
+            <a class="btn btn-sm btn-outline" href="{{ url_for('download_note', note_id=n.id) }}">Download</a>
+            <form method="post" action="{{ url_for('delete_note', note_id=n.id) }}" data-confirm="Delete &quot;{{ n.title }}&quot; permanently?">
+              <input type="hidden" name="_csrf" value="{{ csrf_token() }}">
+              <input type="hidden" name="next" value="{{ back }}">
+              <button class="btn btn-sm btn-danger" type="submit">Delete</button>
+            </form>
+          </td>
+        </tr>
+      {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% else %}<p class="empty">No uploaded materials match.</p>{% endif %}
+</section>
+
+<section>
+  <h2>Users</h2>
+  <div class="table-wrap">
+    <table class="responsive">
+      <thead><tr><th>Username</th><th>Email</th><th>Role</th><th>Notes</th><th>Joined</th><th>Action</th></tr></thead>
+      <tbody>
+      {% for u in users %}
+        <tr>
+          <td data-label="Username">{{ u.username }}</td>
+          <td data-label="Email">{{ u.email }}</td>
+          <td data-label="Role">{{ u.role }}</td>
+          <td data-label="Notes">{{ counts.get(u.id, 0) }}</td>
+          <td data-label="Joined">{{ u.created_at|datefmt }}</td>
+          <td data-label="Action" class="row-actions">
+            {% if u.role != 'admin' %}
+            <form method="post" action="{{ url_for('admin_delete_user', user_id=u.id) }}" data-confirm="Delete user {{ u.username }} and all of their notes?">
+              <input type="hidden" name="_csrf" value="{{ csrf_token() }}">
+              <button class="btn btn-sm btn-danger" type="submit">Delete user</button>
+            </form>
+            {% else %}&mdash;{% endif %}
+          </td>
+        </tr>
+      {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</section>
+{% endblock %}

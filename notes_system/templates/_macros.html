@@ -1,0 +1,26 @@
+{% macro note_card(n, back='') %}
+<article class="note">
+  <div class="tags">
+    <span class="tag tag-dept">{{ n.department }}</span>
+    <span class="tag">{{ n.subject }}</span>
+    {% if n.semester %}<span class="tag">Semester {{ n.semester }}</span>{% endif %}
+    <span class="tag tag-type">{{ n.ext }}</span>
+  </div>
+  <h3>{{ n.title }}</h3>
+  <p class="desc">{{ n.description or 'No description provided.' }}</p>
+  <p class="meta">Shared by {{ n.uploader_name }} on {{ n.uploaded_at|datefmt }}. {{ n.size|filesize }}, downloaded {{ n.downloads }} time{{ '' if n.downloads == 1 else 's' }}.</p>
+  <div class="actions">
+    {% if n.ext in viewable %}
+      <a class="btn btn-sm btn-outline" href="{{ url_for('view_note', note_id=n.id) }}" target="_blank" rel="noopener">View</a>
+    {% endif %}
+    <a class="btn btn-sm" href="{{ url_for('download_note', note_id=n.id) }}">Download</a>
+    {% if g.user and (g.user.role == 'admin' or g.user.id == n.uploader_id) %}
+    <form method="post" action="{{ url_for('delete_note', note_id=n.id) }}" data-confirm="Delete &quot;{{ n.title }}&quot; permanently?">
+      <input type="hidden" name="_csrf" value="{{ csrf_token() }}">
+      <input type="hidden" name="next" value="{{ back }}">
+      <button class="btn btn-sm btn-danger" type="submit">Delete</button>
+    </form>
+    {% endif %}
+  </div>
+</article>
+{% endmacro %}

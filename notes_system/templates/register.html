@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+{% block title %}Create account{% endblock %}
+{% block content %}
+<section class="form-card">
+  <h1>Create your account</h1>
+  <form method="post" novalidate>
+    <input type="hidden" name="_csrf" value="{{ csrf_token() }}">
+    <label for="username">Username</label>
+    <input id="username" name="username" value="{{ form.username or '' }}" required minlength="3" maxlength="20" pattern="[A-Za-z0-9_]+" autocomplete="username">
+    <small>3-20 letters, numbers or underscores.</small>
+
+    <label for="email">Email</label>
+    <input id="email" type="email" name="email" value="{{ form.email or '' }}" required maxlength="120" autocomplete="email">
+
+    <label for="password">Password</label>
+    <div class="pw-row">
+      <input id="password" type="password" name="password" required minlength="8" autocomplete="new-password">
+      <button type="button" class="btn btn-sm btn-outline" data-toggle-password="password">Show</button>
+    </div>
+    <small>At least 8 characters with a letter and a number.</small>
+
+    <label for="confirm">Confirm password</label>
+    <input id="confirm" type="password" name="confirm" required autocomplete="new-password">
+
+    <button class="btn btn-block" type="submit">Create account</button>
+  </form>
+  <p class="alt">Already registered? <a href="{{ url_for('login') }}">Log in</a></p>
+</section>
+{% endblock %}

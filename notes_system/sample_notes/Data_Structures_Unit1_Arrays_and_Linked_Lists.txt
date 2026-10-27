@@ -1,0 +1,25 @@
+DATA STRUCTURES - UNIT 1: ARRAYS AND LINKED LISTS
+=================================================
+
+1. Arrays
+- Contiguous memory; index access is O(1).
+- Insert/delete in the middle is O(n) because elements shift.
+- Fixed size in C; dynamic arrays (Python list, Java ArrayList) resize by doubling.
+
+2. Singly linked list
+- Each node stores data and a pointer to the next node.
+- Insert at head: O(1). Search: O(n). No random access.
+- Traversal: node = head; while node: visit(node); node = node.next
+
+3. Doubly linked list
+- Nodes also hold a prev pointer, so deletion of a known node is O(1).
+
+4. Array vs linked list
+| Operation        | Array | Linked list |
+| Access by index  | O(1)  | O(n)        |
+| Insert at front  | O(n)  | O(1)        |
+| Memory overhead  | low   | pointer per node |
+
+Practice questions
+1. Reverse a singly linked list iteratively.
+2. Detect a cycle using Floyd's tortoise and hare algorithm.

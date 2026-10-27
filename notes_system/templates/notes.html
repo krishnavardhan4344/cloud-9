@@ -1,0 +1,53 @@
+{% extends "base.html" %}
+{% from "_macros.html" import note_card with context %}
+{% block title %}{{ 'My notes' if f.get('mine') == '1' else 'Browse notes' }}{% endblock %}
+{% block content %}
+<div class="page-head">
+  <h1>{{ 'My notes' if f.get('mine') == '1' else 'Browse notes' }}</h1>
+  <a class="btn" href="{{ url_for('upload') }}">Upload a note</a>
+</div>
+
+<form method="get" class="filters" id="filterForm">
+  {% if f.get('mine') == '1' %}<input type="hidden" name="mine" value="1">{% endif %}
+  <input type="search" name="q" value="{{ f.get('q', '') }}" placeholder="Search title, subject, uploader" aria-label="Search notes">
+  <select name="department" aria-label="Department">
+    <option value="">All departments</option>
+    {% for d in departments %}<option value="{{ d }}" {% if f.get('department') == d %}selected{% endif %}>{{ d }}</option>{% endfor %}
+  </select>
+  <select name="subject" aria-label="Subject">
+    <option value="">All subjects</option>
+    {% for s in subjects %}<option value="{{ s }}" {% if f.get('subject', '')|lower == s|lower %}selected{% endif %}>{{ s }}</option>{% endfor %}
+  </select>
+  <select name="semester" aria-label="Semester">
+    <option value="">Any semester</option>
+    {% for s in semesters %}<option value="{{ s }}" {% if f.get('semester') == s|string %}selected{% endif %}>Semester {{ s }}</option>{% endfor %}
+  </select>
+  <select name="type" aria-label="File type">
+    <option value="">All file types</option>
+    {% for t in allowed_exts %}<option value="{{ t }}" {% if f.get('type') == t %}selected{% endif %}>{{ t }}</option>{% endfor %}
+  </select>
+  <select name="sort" aria-label="Sort by">
+    <option value="newest" {% if f.get('sort') in (None, 'newest') %}selected{% endif %}>Newest first</option>
+    <option value="oldest" {% if f.get('sort') == 'oldest' %}selected{% endif %}>Oldest first</option>
+    <option value="title" {% if f.get('sort') == 'title' %}selected{% endif %}>Title A-Z</option>
+    <option value="downloads" {% if f.get('sort') == 'downloads' %}selected{% endif %}>Most downloaded</option>
+  </select>
+  <button class="btn" type="submit">Search</button>
+  <a class="btn btn-outline" href="{{ url_for('notes_list', mine=f.get('mine')) if f.get('mine') == '1' else url_for('notes_list') }}">Clear</a>
+</form>
+
+<p class="result-count">{{ total }} note{{ '' if total == 1 else 's' }} found.</p>
+
+{% if notes %}
+  <div class="grid">{% for n in notes %}{{ note_card(n, back) }}{% endfor %}</div>
+  {% if pages > 1 %}
+  <nav class="pager" aria-label="Pages">
+    {% if page > 1 %}<a class="btn btn-sm btn-outline" href="{{ page_url(page - 1) }}">Previous</a>{% endif %}
+    <span>Page {{ page }} of {{ pages }}</span>
+    {% if page < pages %}<a class="btn btn-sm btn-outline" href="{{ page_url(page + 1) }}">Next</a>{% endif %}
+  </nav>
+  {% endif %}
+{% else %}
+  <p class="empty">Nothing matches those filters. Clear them or <a href="{{ url_for('upload') }}">upload a note</a>.</p>
+{% endif %}
+{% endblock %}
